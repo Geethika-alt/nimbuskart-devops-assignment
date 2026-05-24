@@ -1,0 +1,78 @@
+name: Cost Janitor
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  janitor:
+    runs-on: ubuntu-latest
+
+    services:
+      localstack:
+        image: localstack/localstack
+        ports:
+          - 4566:4566
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Install terraform-local
+        run: pip install terraform-local
+
+      - name: Install Janitor dependencies
+        run: |
+          cd janitor
+          pip install -r requirements.txt
+
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init
+
+      - name: Terraform Apply
+        run: |
+          cd terraform
+          terraform apply -auto-approve
+
+      - name: Run Cost Janitor
+        run: |
+          cd janitor
+          python janitor.py --dry-run
+        continue-on-error: true
+
+      - name: Upload JSON Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-json
+          path: janitor/report.json
+
+      - name: Upload Markdown Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-md
+          path: janitor/report.md
+
+      - name: Comment PR with Report
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('janitor/report.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
