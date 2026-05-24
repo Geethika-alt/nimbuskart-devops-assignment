@@ -148,3 +148,4 @@ print(json.dumps(report, indent=2))
 
 if args.dry_run and findings:
     exit(1)
+    
