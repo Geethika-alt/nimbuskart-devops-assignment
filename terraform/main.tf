@@ -100,6 +100,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
     id     = "expire-non-current-versions"
     status = "Enabled"
 
+    filter {}
+
     noncurrent_version_expiration {
       noncurrent_days = 30
     }
