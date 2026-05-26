@@ -28,7 +28,6 @@ def get_tags(tag_list):
 def missing_required(tags):
     return any(tag not in tags for tag in REQUIRED_TAGS)
 
-# EBS volumes
 volumes = ec2.describe_volumes()["Volumes"]
 
 for v in volumes:
@@ -45,7 +44,6 @@ for v in volumes:
             "safe_to_auto_delete": False
         })
 
-# EC2 instances
 reservations = ec2.describe_instances()["Reservations"]
 
 for r in reservations:
@@ -76,7 +74,6 @@ for r in reservations:
                 "safe_to_auto_delete": False
             })
 
-# Elastic IPs
 addresses = ec2.describe_addresses()["Addresses"]
 
 for a in addresses:
@@ -92,7 +89,6 @@ for a in addresses:
             "safe_to_auto_delete": False
         })
 
-# Write report
 report = {
     "scan_timestamp": datetime.now(timezone.utc).isoformat(),
     "account_id": "000000000000",
@@ -109,11 +105,10 @@ with open("report.json", "w") as f:
 
 with open("report.md", "w") as f:
     f.write("# Cost Janitor Report\n\n")
-    for fnd in findings:
-        f.write(f"- {fnd['resource_type']} {fnd['resource_id']} ({fnd['reason']})\n")
+    for finding in findings:
+        f.write(f"- {finding['resource_type']} {finding['resource_id']} ({finding['reason']})\n")
 
 print(json.dumps(report, indent=2))
 
 if args.dry_run and findings:
     exit(1)
-    
