@@ -1,24 +1,15 @@
 {
-  "scan_timestamp": "2026-05-26T15:00:00Z",
-  "account_id": "000000000000",
-  "region": "us-east-1",
-  "summary": {
-    "total_orphans": 1,
-    "estimated_monthly_waste_usd": 8.0
-  },
-  "findings": [
+  "resources": [
     {
-      "resource_id": "vol-123456",
-      "resource_type": "ebs_volume",
-      "reason": "unattached",
-      "age_days": 21,
-      "estimated_monthly_cost_usd": 8.0,
-      "tags": {
-        "Project": "NimbusKart",
-        "Environment": "staging"
-      },
-      "suggested_action": "delete",
-      "safe_to_auto_delete": false
+      "type": "ebs_volume",
+      "id": "vol-123456",
+      "issue": "unattached"
+    },
+    {
+      "type": "elastic_ip",
+      "id": "eipalloc-123456",
+      "issue": "unused"
     }
-  ]
+  ],
+  "estimated_monthly_waste": 12.10
 }
