@@ -9,4 +9,3 @@ REQUIRED_TAGS = [
     "Environment",
     "Owner"
 ]
-
